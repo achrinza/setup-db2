@@ -1,0 +1,19 @@
+# SPDX-License-Identifier: MIT
+# SPDX-FileCopyrightText: Copyright (c) 2024 Rifa Achrinza
+inputs:
+  db2-license:
+    type: enum
+    allowed-values:
+      - accept
+  db2-version:
+    type: string
+  db2-instance-name:
+    type: string
+  db2-port:
+    type: number
+  db2-dbname:
+    type: string
+  db2-password:
+    type: string
+  db2-container-name:
+    type: string

@@ -1,0 +1,13 @@
+#!/bin/sh
+# SPDX-License-Identifier: MIT
+# SPDX-FileCopyrightText: Copyright (c) 2024 Rifa Achrinza
+
+[ -n "$CI" ] && exit 0
+
+npm exec \
+  --no \
+  --package=commitlint \
+  -- \
+  commitlint \
+    --edit \
+    "$1"

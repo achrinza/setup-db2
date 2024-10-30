@@ -1,0 +1,12 @@
+#!/bin/sh
+# SPDX-License-Identifier: MIT
+# SPDX-FileCopyrightText: Copyright (c) 2024 Rifa Achrinza
+
+[ -n "$CI" ] && exit 0
+if [ "$LINT_STAGED" = "0" ]; then
+  echo "lint-staged disabled via LINT_STAGED env var"
+  exit 0
+fi
+
+npm run --no --package=lint-staged -- lint-staged
+reuse lint

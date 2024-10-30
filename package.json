@@ -1,0 +1,47 @@
+{
+  "name": "@achrinza/setup-db2",
+  "version": "0.1.0",
+  "main": "index.js",
+  "type": "module",
+  "private": true,
+  "scripts": {
+    "prepare": "husky",
+    "test": "mocha",
+    "eslint:check": "eslint",
+    "eslint:fix": "eslint --fix",
+    "prettier:check": "prettier",
+    "prettier:fix": "prettier:fix",
+    "lint:check": "npm run eslint:check && npm run prettier:check",
+    "lint:fix": "npm run eslint:fix && npm run prettier:fix"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/achrinza/setup-db2.git"
+  },
+  "keywords": [
+    "db2",
+    "github",
+    "github-action"
+  ],
+  "author": "Rifa Achrinza",
+  "license": "MIT AND FSFAP",
+  "bugs": {
+    "url": "https://github.com/achrinza/setup-db2/issues"
+  },
+  "homepage": "https://github.com/achrinza/setup-db2#readme",
+  "description": "",
+  "devDependencies": {
+    "@commitlint/cli": "^19.5.0",
+    "@commitlint/config-conventional": "^19.5.0",
+    "eslint": "^9.13.0",
+    "eslint-config-prettier": "^9.1.0",
+    "eslint-plugin-mocha": "^10.5.0",
+    "eslint-plugin-prettier": "^5.2.1",
+    "globals": "^15.11.0",
+    "husky": "^9.1.6",
+    "ibm_db": "^3.2.4",
+    "lint-staged": "^15.2.10",
+    "mocha": "^10.8.2",
+    "prettier": "^3.3.3"
+  }
+}

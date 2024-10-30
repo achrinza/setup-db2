@@ -1,0 +1,12 @@
+# SPDX-License-Identifier: FSFAP
+# SPDX-FileCopyrightText: Copyright (c) 2024 Rifa Achrinza
+# Code editors
+\#*#
+*~
+.#*
+
+# Node.js
+node_modules
+
+# Python
+venv

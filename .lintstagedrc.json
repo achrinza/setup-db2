@@ -1,0 +1,7 @@
+{
+  "*.js": [
+    "npm exec --no --package=prettier -- prettier --write",
+    "npm exec --no --package=eslint -- eslint --fix --report-unused-disable-directives --cache"
+  ],
+  "*.md,*.yaml": "npx --npm exec --package=prettier -- prettier --write"
+}

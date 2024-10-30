@@ -1,0 +1,45 @@
+# SPDX-License-Identifier: MIT
+# SPDX-FileCopyrightText: Copyright (c) 2024 Rifa Achrinza
+name: DB2 in Github Actions
+description: Start a DB2 server
+branding:
+  icon: database
+  color: blue
+inputs:
+  db2-license:
+    description: Agreement to the DB2 License Agreement. Must be explicitly set to 'accept'
+    required: true
+  db2-version:
+    description: DB2 version (OCI image tag/hash) to use
+    required: false
+    default: latest
+  db2-instance-name:
+    description: DB2 instance name. Will also be used as the DB2 user id.
+    required: false
+    default: db2inst1
+  db2-port:
+    description: DB2 port to use
+    default: 50000
+  db2-dbname:
+    description: DB2 database name
+    required: false
+    default: mydb
+  db2-password:
+    description: DB2 user password
+    required: false
+    default: password
+  db2-container-name:
+    description: DB2 container name
+    required: false
+    default: db2server
+runs:
+  using: docker
+  image: Dockerfile
+  args:
+    - -l ${{ inputs.db2-license }}
+    - -t ${{ inputs.db2-version }}
+    - -i ${{ inputs.db2-instance-name }}
+    - -d ${{ inputs.db2-dbname }}
+    - -p ${{ inputs.db2-password }}
+    - -n ${{ inputs.db2-container-name }}
+    - -l ${{ inputs.db2-license }}
