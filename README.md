@@ -50,7 +50,7 @@ jobs:
     name: Test
     runs-on: ubuntu-24.04
       - name: Start DB2 Server
-        uses: achrinza/setup-db2@main
+        uses: achrinza/setup-db2@v0
         with:
           db2-version: latest
       - name: Checkout
