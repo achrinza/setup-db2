@@ -9,8 +9,9 @@ inputs:
   db2-license:
     description: Agreement to the DB2 License Agreement. Must be explicitly set to 'accept'
     required: true
+    default: decline
   db2-version:
-    description: DB2 version (OCI image tag/hash) to use
+    description: DB2 version (OCI image tag or digest) to use
     required: false
     default: latest
   db2-instance-name:

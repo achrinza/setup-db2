@@ -5,12 +5,13 @@ inputs:
     type: enum
     allowed-values:
       - accept
+      - decline
   db2-version:
     type: string
   db2-instance-name:
     type: string
   db2-port:
-    type: number
+    type: integer
   db2-dbname:
     type: string
   db2-password:

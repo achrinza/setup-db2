@@ -15,8 +15,8 @@ permissions: {}
 jobs:
   code-lint:
     name: Code Lint
-    runs-on: ubuntu-latest
-    if: ${{ github.event.pull_request }}
+    runs-on: ubuntu-22.04
+    timeout-minutes: 5
     steps:
       - name: Harden Runner
         uses: step-security/harden-runner@0d381219ddf674d61a7572ddd19d7941e271515c # v2.9.0
@@ -34,19 +34,47 @@ jobs:
           curl -LO https://github.com/koalaman/shellcheck/releases/download/v0.10.0/shellcheck-v0.10.0.linux.x86_64.tar.xz
           tar -xJf shellcheck-v0.10.0.linux.x86_64.tar.xz
           install -Dm 755 "shellcheck-v0.10.0/shellcheck" /usr/local/bin/shellcheck
-      - name: Bootstrap dependencies
+      - name: Bootstrap Dependencies
         run: npm ci
-      - name: Verify code linting
-        run: shellcheck start-db2.sh
+      - name: Verify Code Linting
+        run: |-
+          shellcheck -x \
+            start-db2.sh \
+            scripts/test.sh
+  ghation-types-lint:
+    name: GitHub Action Types Lint
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    steps:
+      - name: Harden Runner
+        uses: step-security/harden-runner@0d381219ddf674d61a7572ddd19d7941e271515c # v2.9.0
+        with:
+          disable-sudo: true
+          egress-policy: block
+          allowed-endpoints: >
+            github.com:443
+      - name: Checkout
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+      - name: Check Typings
+        uses: krzema12/github-actions-typing@d97e69a656cfb72a621da91005dd17616bc8b69e # v1.0.5
   commit-lint:
     name: Commit Lint
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
+    timeout-minutes: 5
     if: ${{ github.event.pull_request }}
     steps:
       - name: Harden Runner
         uses: step-security/harden-runner@0d381219ddf674d61a7572ddd19d7941e271515c # v2.9.0
         with:
-          egress-policy: audit
+          disable-sudo: true
+          egress-policy: block
+          allowed-endpoints: >
+            api.github.com:443
+            github.com:443
+            nodejs.org:443
+            objects.githubusercontent.com:443
+            public.dhe.ibm.com:443
+            registry.npmjs.org:443
       - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
         with:
           fetch-depth: 0
@@ -54,71 +82,66 @@ jobs:
         with:
           node-version: 22
           cache: npm
-      - name: Bootstrap dependencies
+      - name: Bootstrap Dependencies
         run: npm ci
-      - name: Verify commit linting
+      - name: Verify Commit Linting
         run: |-
           npm exec \
             --no \
-            --package=commitlint \
+            --package=@commitlint/cli \
             -- \
             commitlint \
-              --from=origin/master \
+              --from=origin/main \
               --to=HEAD \
               --verbose
   license-lint:
     name: License Lint
     runs-on: ubuntu-24.04
+    timeout-minutes: 5
     steps:
       - name: Harden Runner
         uses: step-security/harden-runner@0d381219ddf674d61a7572ddd19d7941e271515c # v2.9.0
         with:
-          egress-policy: audit
+          disable-sudo: true
+          egress-policy: block
+          allowed-endpoints: >
+            github.com:443
       - name: Checkout
         uses: actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332 # v4.1.7
         with:
-          depth: 1
+          fetch-depth: 1
       - name: Setup REUSE Tool
         uses: fsfe/reuse-action@3ae3c6bdf1257ab19397fab11fd3312144692083 # v4.0.0
-  test-shellscript:
-    name: Test (Internal Shell Script)
-    runs-on: ubuntu-24.04
-    strategy:
-      matrix:
-        db2-version:
-          - 77095d4e04cf4448c0257086afcb2c166193d718dc33441da3b949f97e21efd5 # v11.5.9.0
-    steps:
-      - name: Harden Runner
-        uses: step-security/harden-runner@0d381219ddf674d61a7572ddd19d7941e271515c # v2.9.0
-        with:
-          egress-policy: audit
-      - name: Checkout
-        uses: actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332 # v4.1.7
-        with:
-          depth: 1
-      - name: Setup Node.js
-        uses: actions/setup-node@1e60f620b9541d16bece96c5465dc8ee9832be0b # v4.0.3
-        with:
-          node-version: 22
-          cache: npm
-      - name: Run shell script
-        run: ./scripts/test.sh
   test-ghaction:
     name: Test (GitHub Action)
     runs-on: ubuntu-24.04
+    timeout-minutes: 30
     strategy:
       matrix:
         db2-version:
-          - 77095d4e04cf4448c0257086afcb2c166193d718dc33441da3b949f97e21efd5 # v11.5.9.0
+          - sha256:77095d4e04cf4448c0257086afcb2c166193d718dc33441da3b949f97e21efd5 # v11.5.9.0
     steps:
       - name: Harden Runner
         uses: step-security/harden-runner@0d381219ddf674d61a7572ddd19d7941e271515c # v2.9.0
         with:
-          egress-policy: audit
+          disable-sudo: true
+          egress-policy: block
+          allowed-endpoints: >
+            api.github.com:443
+            auth.docker.io:443
+            dd2.icr.io:443
+            github.com:443
+            icr.io:443
+            nodejs.org:443
+            objects.githubusercontent.com:443
+            production.cloudflare.docker.com:443
+            public.dhe.ibm.com:443
+            registry-1.docker.io:443
+            registry.npmjs.org:443
       - name: Checkout
         uses: actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332 # v4.1.7
         with:
-          depth: 1
+          fetch-depth: 1
       - name: Setup Node.js
         uses: actions/setup-node@1e60f620b9541d16bece96c5465dc8ee9832be0b # v4.0.3
         with:
@@ -129,6 +152,7 @@ jobs:
       - name: Start DB2 Server
         uses: ./
         with:
+          db2-license: accept
           db2-version: ${{ matrix.db2-version }}
       - name: Run Tests
         run: npm test --ignore-scripts
