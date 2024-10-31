@@ -2,18 +2,19 @@
 # SPDX-License-Identifier: MIT
 # SPDX-FileCopyrightText: Copyright (c) 2024 Rifa Achrinza
 
-set -e -o pipefail
+set -e
 trap 'cleanup_db2 1' INT HUP TERM
 
 MODE=run
-DB2_VERSION=latest
+DB2_VERSION='latest'
 DB2_INSTANCE=db2inst1
 DB2_PASSWORD=password
 DB2_DBNAME=mydb
 DB2_DATABASE_DIR=/tmp/db2-database
 DB2_CONTAINER_NAME=db2server
-DB2_LICENSE=
+DB2_LICENSE=decline
 DOCKER_CLI=docker
+TIMEOUT=300
 
 show_help () {
    cat <<EOF
@@ -21,8 +22,9 @@ $0 [-h] [-C] [-t db2_version] [-i db2_instance] [-p db2_password] [-d db2_dbname
 
     -h    Show help
     -C    Run cleanup script only
-    -t    DB2 version (OCI image tag)
+    -V    DB2 version
               Default: $DB2_VERSION
+              An OCI image tag or digest
     -i    DB2 instance name
               Default: $DB2_INSTANCE
               The instnace name will also be the username used to login to the DB2 instance.
@@ -35,7 +37,11 @@ $0 [-h] [-C] [-t db2_version] [-i db2_instance] [-p db2_password] [-d db2_dbname
     -n    DB2 container name
               Default: $DB2_CONTAINER_NAME
     -l    DB2 license
-              Must be explicitly set to `accept` to accept the DB2 license agreement.
+              Must be explicitly set to "accept" to accept the DB2 license agreement.
+              Default: $DB2_LICENSE
+    -t    Timeout
+              Duration to wait for the DB2 container to be ready before aborting.
+              Default: $TIMEOUT
     -c    Docker-compatible CLI
               Default: $DOCKER_CLI
               The program to use for running Docker-compatible commands.
@@ -45,7 +51,7 @@ EOF
 
 parse_opts () {
   OPTIND=1
-  while getopts ':hCt:i:p:d:D:n:l:c:' opt; do
+  while getopts ':hCV:i:p:d:D:n:l:t:c:' opt; do
     case "$opt" in
       \?)
         echo "Invalid option: -$OPTARG" 1>&2
@@ -59,9 +65,20 @@ parse_opts () {
       C)
         MODE=clean
         ;;
-      t)
+      V)
         echo "$OPTARG"
         DB2_VERSION="$OPTARG"
+        case "$DB2_VERSION" in
+          :*|@*)
+            DB2_VERSION_RESOLVED="$DB2_VERSION"
+            ;;
+          sha256*)
+            DB2_VERSION_RESOLVED="@$DB2_VERSION"
+            ;;
+          *)
+            DB2_VERSION_RESOLVED=":$DB2_VERSION"
+            ;;
+        esac
         ;;
       i)
         DB2_INSTANCE="$OPTARG"
@@ -81,12 +98,15 @@ parse_opts () {
       l)
         DB2_LICENSE="$OPTARG"
         ;;
+      t)
+        TIMEOUT="$OPTARG"
+        ;;
       c)
         DOCKER_CLI="$OPTARG"
         ;;
     esac
   done
-  DB2_USERNAME="$(echo $DB2_INSTANCE | tr 'A-Z' 'a-z')"
+  DB2_USERNAME="$(echo "$DB2_INSTANCE" | tr '[:upper:]' '[:lower:]')"
 }
 
 start_db2 () {
@@ -95,22 +115,30 @@ start_db2 () {
   if [ ! -e "$DB2_DATABASE_DIR" ]; then
     mkdir "$DB2_DATABASE_DIR"
   else
-      echo "Directory \`$DB2_DATABASE_DIR\` already exists. Please delete this directory or set the \`-D\` flag." 1>&2
+    cat <<EOF 1>&2
+Directory "$DB2_DATABASE_DIR" already exists. Please either:
+
+1. Delete the directory, or
+2. Use a different directory with the "-D" option, or
+3. Run a cleanup with "$0 -C$([ "$DOCKER_CLI" = 'podman' ] && printf 'c podman' )"
+EOF
       exit 2
   fi
-  "$DOCKER_CLI" run \
-    --detach \
-    --privileged \
-    --name="$DB2_CONTAINER_NAME" \
-    --publish='50000:50000' \
-    --volume="$DB2_DATABASE_DIR:/database" \
-    --env="DB2INSTANCE=$DB2_INSTANCE" \
-    --env="DB2INST1_PASSWORD=$DB2_PASSWORD" \
-    --env="DBNAME=$DB2_DBNAME" \
-    --env="LICENSE=$DB2_LICENSE" \
-    "icr.io/db2_community/db2:$DB2_VERSION" 1>/dev/null
-  if [ "$?" -ne 0 ]; then
+  if ! \
+    "$DOCKER_CLI" run \
+      --detach \
+      --privileged \
+      --name="$DB2_CONTAINER_NAME" \
+      --publish='50000:50000' \
+      --volume="$DB2_DATABASE_DIR:/database" \
+      --env="DB2INSTANCE=$DB2_INSTANCE" \
+      --env="DB2INST1_PASSWORD=$DB2_PASSWORD" \
+      --env="DBNAME=$DB2_DBNAME" \
+      --env="LICENSE=$DB2_LICENSE" \
+      "icr.io/db2_community/db2$DB2_VERSION_RESOLVED" 1>/dev/null; then
+    echo "code $?"
     echo "Error starting DB2 container." 1>&2
+    cleanup_db2 1
     exit 2
   fi
 }
@@ -118,9 +146,8 @@ start_db2 () {
 wait_for_db2 () {
   FEEDBACK="${1:-initialize}"
   DELAY="${2:-0}"
-  TIMEOUT=300
   TIMER=0
-  printf "Waiting for DB2 to $FEEDBACK (Timeout: 5 mins)."
+  printf "Waiting for DB2 to %s (Timeout: 5 mins)." "$FEEDBACK"
 
   until [ "$TIMER" -eq "$DELAY" ]; do
     printf '.'
@@ -159,16 +186,17 @@ wait_for_db2_restart() {
 
 cleanup_db2 () {
     echo 'Cleaning up DB2 files...'
-    echo "Stopping and deleting container \`$DB2_CONTAINER_NAME\`..."
-    if [ "$(
+    echo "Stopping and deleting container \"$DB2_CONTAINER_NAME\"..."
+    # shellcheck disable=2091
+    if $(
       "$DOCKER_CLI" stop "$DB2_CONTAINER_NAME" 1>/dev/null
       "$DOCKER_CLI" rm "$DB2_CONTAINER_NAME" 1>/dev/null
-    )" ]; then
+    ); then
       echo 'Done!'
     else
       echo 'Done (with errors)!'
     fi
-      echo "Deleting \`$DB2_DATABASE_DIR\` directory if it exists (will use sudo if available)..."
+      echo "Deleting \"$DB2_DATABASE_DIR\" directory if it exists (will use sudo if available)..."
     if [ -e "$DB2_DATABASE_DIR" ]; then
       if [ "$(command -v sudo)" ]; then
         sudo rm -r "$DB2_DATABASE_DIR"
@@ -185,6 +213,7 @@ cleanup_db2 () {
     fi
 }
 
+# shellcheck disable=SC2068
 parse_opts $@
 if [ "$MODE" = 'clean' ]; then
   cleanup_db2 0
