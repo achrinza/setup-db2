@@ -9,8 +9,8 @@
     "test": "mocha",
     "eslint:check": "eslint",
     "eslint:fix": "eslint --fix",
-    "prettier:check": "prettier",
-    "prettier:fix": "prettier:fix",
+    "prettier:check": "prettier .",
+    "prettier:fix": "prettier --write .",
     "lint:check": "npm run eslint:check && npm run prettier:check",
     "lint:fix": "npm run eslint:fix && npm run prettier:fix"
   },
