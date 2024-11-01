@@ -68,17 +68,6 @@ parse_opts () {
       V)
         echo "$OPTARG"
         DB2_VERSION="$OPTARG"
-        case "$DB2_VERSION" in
-          :*|@*)
-            DB2_VERSION_RESOLVED="$DB2_VERSION"
-            ;;
-          sha256*)
-            DB2_VERSION_RESOLVED="@$DB2_VERSION"
-            ;;
-          *)
-            DB2_VERSION_RESOLVED=":$DB2_VERSION"
-            ;;
-        esac
         ;;
       i)
         DB2_INSTANCE="$OPTARG"
@@ -112,6 +101,17 @@ parse_opts () {
 start_db2 () {
   echo 'Starting DB2...'
   echo 'Note: This script will attempt to clean up when terminated.'
+  case "$DB2_VERSION" in
+    :*|@*)
+      DB2_VERSION_RESOLVED="$DB2_VERSION"
+      ;;
+    sha256*)
+      DB2_VERSION_RESOLVED="@$DB2_VERSION"
+      ;;
+    *)
+      DB2_VERSION_RESOLVED=":$DB2_VERSION"
+      ;;
+  esac
   if [ ! -e "$DB2_DATABASE_DIR" ]; then
     mkdir "$DB2_DATABASE_DIR"
   else
