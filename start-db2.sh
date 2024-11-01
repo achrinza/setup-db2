@@ -2,7 +2,7 @@
 # SPDX-License-Identifier: MIT
 # SPDX-FileCopyrightText: Copyright (c) 2024 Rifa Achrinza
 
-set -e
+set -eu
 trap 'cleanup_db2 1' INT HUP TERM
 
 MODE=run

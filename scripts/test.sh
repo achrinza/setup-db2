@@ -1,7 +1,7 @@
 #!/bin/sh
 # SPDX-License-Identifier: MIT
 # SPDX-FileCopyrightText: Copyright (c) 2024 Rifa Achrinza
-set -xe
+set -eu
 trap 'cleanup_db2' INT HUP TERM
 
 STARTDB2="$(dirname "$0")/../start-db2.sh"
