@@ -15,7 +15,7 @@ permissions: {}
 jobs:
   code-lint:
     name: Code Lint
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-24.04
     timeout-minutes: 5
     steps:
       - name: Harden Runner
@@ -59,7 +59,7 @@ jobs:
         uses: krzema12/github-actions-typing@d97e69a656cfb72a621da91005dd17616bc8b69e # v1.0.5
   commit-lint:
     name: Commit Lint
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-24.04
     timeout-minutes: 5
     if: ${{ github.event.pull_request }}
     steps:
