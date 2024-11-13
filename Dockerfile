@@ -1,7 +1,7 @@
 # SPDX-License-Identifier: MIT
 # SPDX-FileCopyrightText: Copyright (c) 2024 Rifa Achrinza
 
-FROM docker.io/library/docker:27.3.1-dind@sha256:09bf5e6944db2b59ab9c953d14c0af292459b169f5a2c15169450c072f9bf1d9
+FROM docker.io/library/docker:27.3.1-dind@sha256:bec82cb05983f12a14d8f169b00748f4ded8573f4da5f1d15d375b6a2470289f
 COPY start-db2.sh /start-db2.sh
 RUN chmod +x /start-db2.sh
 ENTRYPOINT ["/start-db2.sh"]
