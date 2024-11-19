@@ -31,8 +31,8 @@
   "homepage": "https://github.com/achrinza/setup-db2#readme",
   "description": "",
   "devDependencies": {
-    "@commitlint/cli": "^19.5.0",
-    "@commitlint/config-conventional": "^19.5.0",
+    "@commitlint/cli": "^19.6.0",
+    "@commitlint/config-conventional": "^19.6.0",
     "eslint": "^9.15.0",
     "eslint-config-prettier": "^9.1.0",
     "eslint-plugin-mocha": "^10.5.0",
