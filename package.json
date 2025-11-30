@@ -42,6 +42,6 @@
     "ibm_db": "^3.3.4",
     "lint-staged": "^15.5.2",
     "mocha": "^11.7.5",
-    "prettier": "^3.7.2"
+    "prettier": "^3.7.3"
   }
 }
