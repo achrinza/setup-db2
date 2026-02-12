@@ -56,7 +56,7 @@ jobs:
       - name: Checkout
         uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4.3.1
       - name: Check Typings
-        uses: krzema12/github-actions-typing@21db25f90324def9328034891ea446b023b8ea77 # v1.0.6
+        uses: krzema12/github-actions-typing@9ddf35b71a482be7d8922b28e8d00df16b77e315 # v2.2.2
   commit-lint:
     name: Commit Lint
     runs-on: ubuntu-24.04
