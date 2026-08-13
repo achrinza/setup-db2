@@ -42,6 +42,7 @@ jobs:
           shellcheck -x \
             start-db2.sh \
             scripts/test.sh
+          npm run lint:check
   ghation-types-lint:
     name: GitHub Action Types Lint
     runs-on: ubuntu-24.04
