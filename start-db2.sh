@@ -18,7 +18,9 @@ TIMEOUT=300
 
 show_help () {
    cat <<EOF
-$0 [-h] [-C] [-t db2_version] [-i db2_instance] [-p db2_password] [-d db2_dbname] [-D db2_database_directory] [-n db2_container_name] [-c docker_cli]
+$0 [-h]
+$0 [-C] [-c docker_cli]
+$0 [-V db2_version] [-i db2_instance] [-p db2_password] [-d db2_dbname] [-D db2_database_directory] [-n db2_container_name] [-c docker_cli]
 
     -h    Show help
     -C    Run cleanup script only
@@ -124,7 +126,7 @@ Directory "$DB2_DATABASE_DIR" already exists. Please either:
 EOF
       exit 2
   fi
-  if ! \
+  if ! $(\
     "$DOCKER_CLI" run \
       --detach \
       --privileged \
@@ -135,7 +137,8 @@ EOF
       --env="DB2INST1_PASSWORD=$DB2_PASSWORD" \
       --env="DBNAME=$DB2_DBNAME" \
       --env="LICENSE=$DB2_LICENSE" \
-      "icr.io/db2_community/db2$DB2_VERSION_RESOLVED" 1>/dev/null; then
+      "icr.io/db2_community/db2$DB2_VERSION_RESOLVED" 1>/dev/null)
+  then
     echo "code $?"
     echo "Error starting DB2 container." 1>&2
     cleanup_db2 1
@@ -156,7 +159,7 @@ wait_for_db2 () {
   done
   
   until \
-    cat <<EOF | "$DOCKER_CLI" exec -iu "$DB2_USERNAME" "$DB2_CONTAINER_NAME" bash 1>/dev/null 2>/dev/null
+    cat <<EOF | "$DOCKER_CLI" exec -iu "$DB2_USERNAME" "$DB2_CONTAINER_NAME" bash 1>/dev/null 2>&1
         source ~/.bashrc
         db2 CONNECT TO $DB2_DBNAME
         db2 SELECT \* FROM sysibm.sysdummy1
