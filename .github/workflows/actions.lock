@@ -7,7 +7,7 @@ workflows:
         - 'actions/checkout@v7.0.1'
         - 'actions/setup-node@v7.0.0'
         - 'fsfe/reuse-action@v6.0.0'
-        - 'step-security/harden-runner@v2.22.0'
+        - 'step-security/harden-runner@v2.22.1'
         - 'typesafegithub/github-actions-typing@v2.2.2'
 dependencies:
     'actions/checkout@v7.0.1':
@@ -25,9 +25,9 @@ dependencies:
         commit: 'sha1-676e2d560c9a403aa252096d99fcab3e1132b0f5'
         owner_id: 27927890
         repo_id: 244390200
-    'step-security/harden-runner@v2.22.0':
-        ref: 'v2.22.0'
-        commit: 'sha1-351661ca32ac09a36dc5ee2d536e3128f2a3c8ed'
+    'step-security/harden-runner@v2.22.1':
+        ref: 'v2.22.1'
+        commit: 'sha1-ccd8616d44fd3846e67624a50d5aad6d37bf2d25'
         owner_id: 88700172
         repo_id: 422287306
     'typesafegithub/github-actions-typing@v2.2.2':
