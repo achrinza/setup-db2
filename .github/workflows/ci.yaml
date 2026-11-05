@@ -16,7 +16,7 @@ permissions: {}
 jobs:
   code-lint:
     name: Code Lint
-    runs-on: ubuntu-24.04
+    runs-on: ubuntu-26.04
     timeout-minutes: 5
     steps:
       - name: Harden Runner
@@ -44,7 +44,7 @@ jobs:
             scripts/test.sh
   ghation-types-lint:
     name: GitHub Action Types Lint
-    runs-on: ubuntu-24.04
+    runs-on: ubuntu-26.04
     timeout-minutes: 5
     steps:
       - name: Harden Runner
@@ -60,7 +60,7 @@ jobs:
         uses: typesafegithub/github-actions-typing@v2.2.2
   commit-lint:
     name: Commit Lint
-    runs-on: ubuntu-24.04
+    runs-on: ubuntu-26.04
     timeout-minutes: 5
     if: ${{ github.event.pull_request }}
     steps:
@@ -97,7 +97,7 @@ jobs:
               --verbose
   license-lint:
     name: License Lint
-    runs-on: ubuntu-24.04
+    runs-on: ubuntu-26.04
     timeout-minutes: 5
     steps:
       - name: Harden Runner
@@ -115,7 +115,7 @@ jobs:
         uses: fsfe/reuse-action@v6.0.0
   test-ghaction:
     name: Test (GitHub Action)
-    runs-on: ubuntu-24.04
+    runs-on: ubuntu-26.04
     timeout-minutes: 30
     strategy:
       matrix:
